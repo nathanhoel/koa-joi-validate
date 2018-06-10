@@ -13,6 +13,7 @@ function validateObject (object = {}, label, schema, options) {
   if (schema) {
     // Validate the object against the provided schema
     const { error, value } = joi.validate(object, schema, options)
+    object = value
     if (error) {
       // Throw error with custom message if validation failed
       throw new Error(`Invalid ${label} - ${error.message}`)
