@@ -4,17 +4,17 @@
   "description": "Tiny module to generate request validation middleware for Koa using Joi.",
   "main": "index.js",
   "scripts": {},
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/triestpa/koa-joi-validate"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/triestpa/koa-joi-validate"
   },
   "author": {
-    "name":"Patrick Triest",
-    "email" :"patrick.triest@gmail.com",
-    "url":"https://blog.patricktriest.com"
+    "name": "Patrick Triest",
+    "email": "patrick.triest@gmail.com",
+    "url": "https://blog.patricktriest.com"
   },
   "license": "MIT",
   "dependencies": {
-    "joi": "10.6.0"
+    "joi": "13.4.0"
   }
 }

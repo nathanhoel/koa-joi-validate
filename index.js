@@ -29,19 +29,23 @@ function validateObject (object = {}, label, schema, options) {
  * @param {Object} validationObj.params The request params schema
  * @param {Object} validationObj.query The request query schema
  * @param {Object} validationObj.body The request body schema
+ * @param {Object} options The Joi options
  * @returns A validation middleware function.
  */
-function validate (validationObj) {
+function validate (validationObj, options = {}) {
+  const headerOptions = Object.assign({}, options)
+  headerOptions.allowUnknown = true
+
   // Return a Koa middleware function
   return (ctx, next) => {
     try {
       // Validate each request data object in the Koa context object
-      validateObject(ctx.headers, 'Headers', validationObj.headers, { allowUnknown: true })
-      validateObject(ctx.params, 'URL Parameters', validationObj.params)
-      validateObject(ctx.query, 'URL Query', validationObj.query)
+      validateObject(ctx.headers, 'Headers', validationObj.headers, headerOptions)
+      validateObject(ctx.params, 'URL Parameters', validationObj.params, options)
+      validateObject(ctx.query, 'URL Query', validationObj.query, options)
 
       if (ctx.request.body) {
-        validateObject(ctx.request.body, 'Request Body', validationObj.body)
+        validateObject(ctx.request.body, 'Request Body', validationObj.body, options)
       }
 
       return next()
