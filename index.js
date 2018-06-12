@@ -8,15 +8,17 @@ const joi = require('joi')
  * @param {String} label The label to use in the error message.
  * @param {JoiSchema} schema The Joi schema to validate the object against.
  */
-function validateObject (object = {}, label, schema, options) {
+function validateObject (ctx, object = {}, label, schema, options, joiOverrides = {}) {
   // Skip validation if no schema is provided
   if (schema) {
+    const mergedOptions = Object.assign(joiOverrides, options.joi)
+
     // Validate the object against the provided schema
-    const { error, value } = joi.validate(object, schema, options)
+    const { error, value } = joi.validate(object, schema, mergedOptions)
     object = Object.assign(object, value)
+
     if (error) {
-      // Throw error with custom message if validation failed
-      throw new Error(`Invalid ${label} - ${error.message}`)
+      ctx.throw(options, err.message)
     }
   }
 }
@@ -34,26 +36,20 @@ function validateObject (object = {}, label, schema, options) {
  * @returns A validation middleware function.
  */
 function validate (validationObj, options = {}) {
-  const headerOptions = Object.assign({}, options)
-  headerOptions.allowUnknown = true
+  options.status = options.status || 422
 
   // Return a Koa middleware function
   return (ctx, next) => {
-    try {
-      // Validate each request data object in the Koa context object
-      validateObject(ctx.headers, 'Headers', validationObj.headers, headerOptions)
-      validateObject(ctx.params, 'URL Parameters', validationObj.params, options)
-      validateObject(ctx.query, 'URL Query', validationObj.query, options)
+    // Validate each request data object in the Koa context object
+    validateObject(ctx, ctx.headers, 'Headers', validationObj.headers, options, { allowUnknown: true })
+    validateObject(ctx, ctx.params, 'URL Parameters', validationObj.params, options)
+    validateObject(ctx, ctx.query, 'URL Query', validationObj.query, options)
 
-      if (ctx.request.body) {
-        validateObject(ctx.request.body, 'Request Body', validationObj.body, options)
-      }
-
-      return next()
-    } catch (err) {
-      // If any of the objects fails validation, send an HTTP 400 response.
-      ctx.throw(400, err.message)
+    if (ctx.request.body) {
+      validateObject(ctx, ctx.request.body, 'Request Body', validationObj.body, options)
     }
+
+    return next()
   }
 }
 
