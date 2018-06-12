@@ -18,7 +18,7 @@ function validateObject (ctx, object = {}, label, schema, options, joiOverrides 
     object = Object.assign(object, value)
 
     if (error) {
-      ctx.throw(options, err.message)
+      ctx.throw(options, error.message)
     }
   }
 }
